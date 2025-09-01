@@ -11,9 +11,13 @@
                 <x-app-logo />
             </a>
 
+
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="tag" :href="route('kategori-baju.index')" :current="request()->routeIs('kategori-baju.*')" wire:navigate>
+                        Kategori Baju
+                    </flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 

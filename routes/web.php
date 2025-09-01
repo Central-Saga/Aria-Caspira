@@ -17,6 +17,12 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+
+    // --- TAMBAHKAN SEMUA ROUTE KATEGORI BAJU DI SINI ---
+    Volt::route('kategori-baju', 'pages.kategori-baju.index')->name('kategori-baju.index');
+    Volt::route('kategori-baju/tambah', 'pages.kategori-baju.create')->name('kategori-baju.create');
+    Volt::route('kategori-baju/{kategori}/edit', 'pages.kategori-baju.edit')->name('kategori-baju.edit');
+    // --- BATAS PENAMBAHAN ROUTE ---
 });
 
 require __DIR__.'/auth.php';
