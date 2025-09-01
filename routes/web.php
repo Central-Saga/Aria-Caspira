@@ -17,6 +17,9 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
+
+    // Inventori: Kategori Baju
+    Volt::route('inventori/kategori-baju', 'pages.kategori-baju.index')->name('inventory.categories');
 });
 
 require __DIR__.'/auth.php';
