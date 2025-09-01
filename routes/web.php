@@ -20,6 +20,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Inventori: Kategori Baju
     Volt::route('inventori/kategori-baju', 'pages.kategori-baju.index')->name('inventory.categories');
+    Volt::route('inventori/kategori-baju/create', 'pages.kategori-baju.create')->name('kategori.create');
+    Volt::route('inventori/kategori-baju/edit/{id}', 'pages.kategori-baju.edit')->name('kategori.edit');
 });
 
 require __DIR__.'/auth.php';

@@ -6,6 +6,10 @@ use Livewire\Attributes\Layout;
 use App\Models\KategoriBaju;
 
 new class extends Component {
+    #[\Livewire\Attributes\On('kategori-updated')]
+    public function refreshKategori() {
+        $this->resetPage();
+    }
     use WithPagination;
 
     #[Layout('components.layouts.app')]
@@ -79,7 +83,7 @@ new class extends Component {
                         {{ __('Kelola kategori baju untuk sistem inventori') }}
                     </p>
                 </div>
-                <a href="#"
+                <a href="{{ route('kategori.create') }}"
                    class="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
                    title="{{ __('Buat Kategori (belum tersedia)') }}">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,6 +180,13 @@ new class extends Component {
                                 </div>
                             </div>
                             <div class="flex items-center space-x-2 flex-shrink-0 ml-3">
+                                <a href="{{ route('kategori.edit', $category->id) }}"
+                                   class="p-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20 rounded-lg transition-colors"
+                                   title="{{ __('Edit Category') }}">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </a>
                                 <button wire:click="confirmDelete({{ $category->id }})"
                                         class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                         title="{{ __('Delete Category') }}">
