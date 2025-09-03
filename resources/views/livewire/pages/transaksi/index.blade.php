@@ -13,9 +13,15 @@ new class extends Component {
 
     public string $search = '';
     public string $filterJenis = '';
+    public string $period = ''; // '', 'hari','minggu','bulan','tahun'
+    public ?string $fromDate = null; // Y-m-d
+    public ?string $toDate = null;   // Y-m-d
 
     public function updatingSearch(): void { $this->resetPage(); }
     public function updatingFilterJenis(): void { $this->resetPage(); }
+    public function updatingPeriod(): void { $this->resetPage(); $this->fromDate = $this->toDate = null; }
+    public function updatedFromDate(): void { $this->period = ''; $this->resetPage(); }
+    public function updatedToDate(): void { $this->period = ''; $this->resetPage(); }
 
     public function with(): array
     {
@@ -32,6 +38,26 @@ new class extends Component {
             $query->where('jenis_transaksi', $this->filterJenis);
         }
 
+        // Filter tanggal berdasarkan period atau rentang tanggal
+        if (in_array($this->period, ['hari','minggu','bulan','tahun'])) {
+            $start = match($this->period) {
+                'hari' => now()->startOfDay(),
+                'minggu' => now()->startOfWeek(),
+                'bulan' => now()->startOfMonth(),
+                'tahun' => now()->startOfYear(),
+                default => null,
+            };
+            if ($start) {
+                $query->whereBetween('tanggal', [$start, now()]);
+            }
+        } elseif ($this->fromDate || $this->toDate) {
+            $from = $this->fromDate ? \Carbon\Carbon::parse($this->fromDate)->startOfDay() : Transaksi::min('tanggal');
+            $to = $this->toDate ? \Carbon\Carbon::parse($this->toDate)->endOfDay() : now();
+            if ($from && $to) {
+                $query->whereBetween('tanggal', [$from, $to]);
+            }
+        }
+
         $totalMasuk = (int) Transaksi::where('jenis_transaksi','masuk')->sum('jumlah');
         $totalKeluar = (int) Transaksi::where('jenis_transaksi','keluar')->sum('jumlah');
 
@@ -42,6 +68,13 @@ new class extends Component {
                 'totalMasuk' => $totalMasuk,
                 'totalKeluar' => $totalKeluar,
             ],
+            'printUrl' => route('transaksi.print', [
+                'search' => $this->search,
+                'jenis' => $this->filterJenis,
+                'period' => $this->period,
+                'from' => $this->fromDate,
+                'to' => $this->toDate,
+            ]),
         ];
     }
 }; ?>
@@ -78,10 +111,15 @@ new class extends Component {
 
         <div class="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </div>
-                <input wire:model.live="search" type="text" class="block w-full pl-12 pr-4 py-3 border-0 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-lg" placeholder="{{ __('Cari keterangan atau nama baju...') }}">
+                <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    
+                </span>
+                <input
+                    wire:model.live="search"
+                    type="text"
+                    class="block w-full pl-11 pr-4 py-3 border-0 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none shadow-lg"
+                    placeholder="{{ __('Cari keterangan atau nama baju...') }}"
+                />
             </div>
             <div>
                 <select wire:model.live="filterJenis" class="block w-full px-4 py-3 border-0 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 shadow-lg">
@@ -89,6 +127,39 @@ new class extends Component {
                     <option value="masuk">{{ __('Masuk') }}</option>
                     <option value="keluar">{{ __('Keluar') }}</option>
                 </select>
+            </div>
+            <div class="grid grid-cols-1 gap-3">
+                <div class="flex items-center gap-2">
+                    <select wire:model.live="period" class="flex-1 px-4 py-3 border-0 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 shadow-lg {{ ($fromDate||$toDate) ? 'opacity-50 cursor-not-allowed' : '' }}" @disabled($fromDate || $toDate)
+                        <option value="">{{ __('Pilih Periode') }}</option>
+                        <option value="hari">{{ __('Hari ini') }}</option>
+                        <option value="minggu">{{ __('Minggu ini') }}</option>
+                        <option value="bulan">{{ __('Bulan ini') }}</option>
+                        <option value="tahun">{{ __('Tahun ini') }}</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <input wire:model.live="fromDate" type="date" class="px-4 py-3 border-0 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 shadow-lg {{ $period ? 'opacity-50 cursor-not-allowed' : '' }}" @disabled($period !== '')>
+                    <input wire:model.live="toDate" type="date" class="px-4 py-3 border-0 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 shadow-lg {{ $period ? 'opacity-50 cursor-not-allowed' : '' }}" @disabled($period !== '')>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="text-sm text-gray-600 dark:text-gray-300">
+                @if($period)
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">{{ __('Periode') }}: {{ ucfirst($period) }}</span>
+                @elseif($fromDate || $toDate)
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">{{ __('Rentang') }}: {{ $fromDate ?? '—' }} → {{ $toDate ?? '—' }}</span>
+                @else
+                    <span class="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200">{{ __('Tanpa filter tanggal') }}</span>
+                @endif
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ $printUrl }}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-lg hover:shadow-xl transition">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 18H5a2 2 0 01-2-2v-5h18v5a2 2 0 01-2 2h-1m-12 0h12v4H6v-4z"/></svg>
+                    {{ __('Cetak Laporan (PDF)') }}
+                </a>
             </div>
         </div>
 
@@ -137,4 +208,3 @@ new class extends Component {
         </div>
     </div>
 </div>
-

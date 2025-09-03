@@ -12,21 +12,26 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Primary login user
-        User::factory()->create([
-            'name' => 'Admin User',
+        // 3 akun utama
+        $super = User::factory()->create([
+            'name' => 'Super Admin',
+            'email' => 'superadmin@example.com',
+            'role' => 'Super Admin',
+        ]);
+
+        $admin = User::factory()->create([
+            'name' => 'Admin',
             'email' => 'admin@example.com',
-            // password is set by factory to 'password'
+            'role' => 'Admin',
         ]);
 
-        // Optionally a demo user
-        User::factory()->create([
-            'name' => 'Demo User',
-            'email' => 'demo@example.com',
+        $staff = User::factory()->create([
+            'name' => 'Staff',
+            'email' => 'staff@example.com',
+            'role' => 'Staff',
         ]);
 
-        // Additional random users
-        User::factory(3)->create();
+        // Tambahan contoh pengguna
+        User::factory(5)->create();
     }
 }
-

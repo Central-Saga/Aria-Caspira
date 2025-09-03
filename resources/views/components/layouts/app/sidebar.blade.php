@@ -14,38 +14,44 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    @if(auth()->user()?->can('manage users'))
+                        <flux:navlist.item icon="layout-grid" :href="route('users.index')" :current="request()->routeIs('users.*')" wire:navigate>{{ __('Pengguna') }}</flux:navlist.item>
+                    @endif
+                    @if(auth()->user()?->can('manage roles'))
+                        <flux:navlist.item icon="folder" :href="route('roles.index')" :current="request()->routeIs('roles.*')" wire:navigate>{{ __('Roles') }}</flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
                 <flux:navlist.group :heading="__('Inventori')" class="grid mt-2">
-                    <flux:navlist.item icon="folder" :href="route('inventory.categories')" :current="request()->routeIs('inventory.categories')" wire:navigate>
-                        {{ __('Kategori Baju') }}
-                    </flux:navlist.item>
-                    <flux:navlist.item icon="layout-grid" :href="route('inventory.baju')" :current="request()->routeIs('inventory.baju')" wire:navigate>
-                        {{ __('Baju') }}
-                    </flux:navlist.item>
-                    <flux:navlist.item icon="book-open-text" :href="route('inventory.transaksi')" :current="request()->routeIs('inventory.transaksi')" wire:navigate>
-                        {{ __('Transaksi') }}
-                    </flux:navlist.item>
-                    <?php $__notifUnread = \App\Models\NotifikasiStok::where('terbaca', false)->count(); ?>
-                    <flux:navlist.item icon="bell" :href="route('inventory.notifications')" :current="request()->routeIs('inventory.notifications')" wire:navigate>
-                        {{ __('Notifikasi Stok') }}
-                        @if($__notifUnread > 0)
-                            <span class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $__notifUnread }}</span>
-                        @endif
-                    </flux:navlist.item>
+                    @if(auth()->user()?->can('manage categories'))
+                        <flux:navlist.item icon="folder" :href="route('inventory.categories')" :current="request()->routeIs('inventory.categories')" wire:navigate>
+                            {{ __('Kategori Baju') }}
+                        </flux:navlist.item>
+                    @endif
+                    @if(auth()->user()?->can('manage baju'))
+                        <flux:navlist.item icon="layout-grid" :href="route('inventory.baju')" :current="request()->routeIs('inventory.baju')" wire:navigate>
+                            {{ __('Baju') }}
+                        </flux:navlist.item>
+                    @endif
+                    @if(auth()->user()?->can('manage transaksi'))
+                        <flux:navlist.item icon="book-open-text" :href="route('inventory.transaksi')" :current="request()->routeIs('inventory.transaksi')" wire:navigate>
+                            {{ __('Transaksi') }}
+                        </flux:navlist.item>
+                    @endif
+                    @if(auth()->user()?->can('manage notifications'))
+                        <?php $__notifUnread = \App\Models\NotifikasiStok::where('terbaca', false)->count(); ?>
+                        <flux:navlist.item icon="bell" :href="route('inventory.notifications')" :current="request()->routeIs('inventory.notifications')" wire:navigate>
+                            {{ __('Notifikasi Stok') }}
+                            @if($__notifUnread > 0)
+                                <span class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $__notifUnread }}</span>
+                            @endif
+                        </flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
 
-            <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
-            </flux:navlist>
+            
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
