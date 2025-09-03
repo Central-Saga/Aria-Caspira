@@ -180,7 +180,7 @@ new class extends Component {
                                 </div>
                             </div>
                             <div class="flex items-center space-x-2 flex-shrink-0 ml-3">
-                                <a href="{{ route('kategori.edit', $category->id) }}"
+                                <a href="{{ route('kategori.edit', $category) }}"
                                    class="p-2 text-gray-600 hover:text-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900/20 rounded-lg transition-colors"
                                    title="{{ __('Edit Category') }}">
                                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
