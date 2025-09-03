@@ -4,6 +4,7 @@ use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use App\Models\NotifikasiStok;
+use App\Models\Baju;
 
 new class extends Component {
     use WithPagination;
@@ -27,6 +28,9 @@ new class extends Component {
 
     public function with(): array
     {
+        // Sinkronkan notifikasi otomatis berdasarkan stok baju
+        $this->syncNotifications();
+
         $query = NotifikasiStok::with('baju');
         if ($this->search !== '') {
             $s = "%{$this->search}%";
@@ -50,6 +54,46 @@ new class extends Component {
                 'critical' => NotifikasiStok::where('status', 'critical')->count(),
             ],
         ];
+    }
+
+    private function syncNotifications(): void
+    {
+        $items = Baju::select('id','nama_baju','stok_tersedia')->get();
+        foreach ($items as $baju) {
+            $status = null;
+            $message = null;
+            if ($baju->stok_tersedia < 10) {
+                $status = 'critical';
+                $message = __('Stok sangat rendah: :stok', ['stok' => $baju->stok_tersedia]);
+            } elseif ($baju->stok_tersedia < 100) {
+                $status = 'warning';
+                $message = __('Stok menipis: :stok', ['stok' => $baju->stok_tersedia]);
+            }
+
+            $existing = NotifikasiStok::where('baju_id', $baju->id)->first();
+
+            if ($status) {
+                if ($existing) {
+                    $existing->update([
+                        'status' => $status,
+                        'pesan' => $message,
+                        'terbaca' => false,
+                    ]);
+                } else {
+                    NotifikasiStok::create([
+                        'baju_id' => $baju->id,
+                        'status' => $status,
+                        'pesan' => $message,
+                        'terbaca' => false,
+                    ]);
+                }
+            } else {
+                // Jika stok aman, tandai notifikasi (jika ada) sebagai terbaca
+                if ($existing && !$existing->terbaca) {
+                    $existing->update(['terbaca' => true, 'pesan' => __('Stok aman: :stok', ['stok' => $baju->stok_tersedia])]);
+                }
+            }
+        }
     }
 }; ?>
 
@@ -121,7 +165,10 @@ new class extends Component {
                                         <span class="ml-2 text-xs text-blue-600">• {{ __('Baru') }}</span>
                                     @endif
                                 </p>
-                                <p class="text-sm text-gray-600 dark:text-gray-300 truncate">{{ $n->pesan ?? '—' }}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-300 truncate">
+                                    {{ $n->pesan ?? '—' }}
+                                    <span class="ml-2 text-gray-500">(Stok: {{ $n->baju?->stok_tersedia ?? '—' }})</span>
+                                </p>
                             </div>
                         </div>
                         <div class="flex items-center gap-3">
@@ -141,4 +188,3 @@ new class extends Component {
         </div>
     </div>
 </div>
-

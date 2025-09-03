@@ -25,8 +25,12 @@
                     <flux:navlist.item icon="book-open-text" :href="route('inventory.transaksi')" :current="request()->routeIs('inventory.transaksi')" wire:navigate>
                         {{ __('Transaksi') }}
                     </flux:navlist.item>
+                    <?php $__notifUnread = \App\Models\NotifikasiStok::where('terbaca', false)->count(); ?>
                     <flux:navlist.item icon="bell" :href="route('inventory.notifications')" :current="request()->routeIs('inventory.notifications')" wire:navigate>
                         {{ __('Notifikasi Stok') }}
+                        @if($__notifUnread > 0)
+                            <span class="ml-auto inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">{{ $__notifUnread }}</span>
+                        @endif
                     </flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
