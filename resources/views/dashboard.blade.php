@@ -29,6 +29,9 @@
             $trend[] = ['label' => $day->format('d M'), 'net' => $masuk - $keluar];
         }
         $maxAbs = max(1, collect($trend)->map(fn($t) => abs($t['net']))->max() ?? 1);
+        $barWidthClass = $trendDays <= 14 ? 'w-6' : 'w-3';
+        $gapClass = $trendDays <= 14 ? 'gap-3' : 'gap-1';
+        $labelStep = $trendDays <= 14 ? 1 : 3;
 
         // Low stock per-card sort
         $lsSort = request('ls_sort','asc');
@@ -124,12 +127,16 @@
                             <span class="text-xs text-gray-500">{{ now()->subDays($trendDays-1)->format('d M') }} - {{ now()->format('d M') }}</span>
                         </div>
                     </div>
-                    <div class="flex items-end gap-3 h-40">
-                        @foreach($trend as $t)
+                    <div class="flex items-end {{ $gapClass }} h-40">
+                        @foreach($trend as $i => $t)
                             <?php $h = max(4, round((abs($t['net']) / $maxAbs) * 140)); $pos = $t['net'] >= 0; ?>
                             <div class="flex flex-col items-center justify-end w-full">
-                                <div class="w-6 rounded-t-md {{ $pos ? 'bg-emerald-500' : 'bg-red-500' }}" style="height: {{ $h }}px"></div>
-                                <div class="mt-2 text-[11px] text-gray-600 dark:text-gray-300">{{ $t['label'] }}</div>
+                                <div class="{{ $barWidthClass }} rounded-t-md {{ $pos ? 'bg-emerald-500' : 'bg-red-500' }}" style="height: {{ $h }}px"></div>
+                                @if($labelStep === 1 || $i % $labelStep === 0)
+                                    <div class="mt-2 text-[10px] text-gray-600 dark:text-gray-300">{{ $t['label'] }}</div>
+                                @else
+                                    <div class="mt-2 text-[10px] text-transparent select-none">{{ $t['label'] }}</div>
+                                @endif
                             </div>
                         @endforeach
                     </div>
@@ -137,11 +144,11 @@
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('Notifikasi Stok') }}</h3>
-                        <a href="{{ route('inventory.notifications') }}" class="text-sm text-emerald-600 hover:underline">{{ __('Lihat semua') }}</a>
+                        <a href="{{ route('inventory.notifications') }}" class="text-xs text-emerald-600 hover:underline">{{ __('Lihat semua') }}</a>
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">{{ __('Belum terbaca') }}</p>
-                    <p class="text-3xl font-bold text-blue-600">{{ $unreadNotif }}</p>
-                    <p class="mt-2 text-xs text-gray-500">{{ __('Jumlah peringatan stok menipis/critical') }}</p>
+                    <p class="text-xs text-gray-600 dark:text-gray-300 mb-1">{{ __('Belum terbaca') }}</p>
+                    <p class="text-2xl font-bold text-blue-600">{{ $unreadNotif }}</p>
+                    <p class="mt-1 text-[11px] text-gray-500">{{ __('Jumlah peringatan stok menipis/critical') }}</p>
                 </div>
             </div>
 
