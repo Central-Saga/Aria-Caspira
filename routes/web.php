@@ -27,6 +27,16 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('inventori/baju', 'pages.baju.index')->name('inventory.baju');
     Volt::route('inventori/baju/create', 'pages.baju.create')->name('baju.create');
     Volt::route('inventori/baju/edit/{baju}', 'pages.baju.edit')->name('baju.edit');
+
+    // Inventori: Transaksi
+    Volt::route('inventori/transaksi', 'pages.transaksi.index')->name('inventory.transaksi');
+    Volt::route('inventori/transaksi/create', 'pages.transaksi.create')->name('transaksi.create');
+    Volt::route('inventori/transaksi/edit/{transaksi}', 'pages.transaksi.edit')->name('transaksi.edit');
+
+    // Inventori: Notifikasi Stok
+    Volt::route('inventori/notifikasi-stok', 'pages.notifikasistok.index')->name('inventory.notifications');
+    Volt::route('inventori/notifikasi-stok/create', 'pages.notifikasistok.create')->name('notifikasi.create');
+    Volt::route('inventori/notifikasi-stok/edit/{notifikasi}', 'pages.notifikasistok.edit')->name('notifikasi.edit');
 });
 
 require __DIR__.'/auth.php';

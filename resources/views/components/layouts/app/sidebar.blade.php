@@ -22,6 +22,12 @@
                     <flux:navlist.item icon="layout-grid" :href="route('inventory.baju')" :current="request()->routeIs('inventory.baju')" wire:navigate>
                         {{ __('Baju') }}
                     </flux:navlist.item>
+                    <flux:navlist.item icon="book-open-text" :href="route('inventory.transaksi')" :current="request()->routeIs('inventory.transaksi')" wire:navigate>
+                        {{ __('Transaksi') }}
+                    </flux:navlist.item>
+                    <flux:navlist.item icon="bell" :href="route('inventory.notifications')" :current="request()->routeIs('inventory.notifications')" wire:navigate>
+                        {{ __('Notifikasi Stok') }}
+                    </flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
