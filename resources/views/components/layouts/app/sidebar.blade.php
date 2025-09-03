@@ -19,6 +19,9 @@
                     <flux:navlist.item icon="folder" :href="route('inventory.categories')" :current="request()->routeIs('inventory.categories')" wire:navigate>
                         {{ __('Kategori Baju') }}
                     </flux:navlist.item>
+                    <flux:navlist.item icon="layout-grid" :href="route('inventory.baju')" :current="request()->routeIs('inventory.baju')" wire:navigate>
+                        {{ __('Baju') }}
+                    </flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
