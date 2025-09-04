@@ -20,6 +20,9 @@
                     @if(auth()->user()?->can('manage roles'))
                         <flux:navlist.item icon="folder" :href="route('roles.index')" :current="request()->routeIs('roles.*')" wire:navigate>{{ __('Roles') }}</flux:navlist.item>
                     @endif
+                    @if(auth()->user()?->can('manage users') || auth()->user()?->can('manage roles'))
+                        <flux:navlist.item icon="book-open" :href="route('activity.index')" :current="request()->routeIs('activity.index')" wire:navigate>{{ __('Activity Logs') }}</flux:navlist.item>
+                    @endif
                 </flux:navlist.group>
                 <flux:navlist.group :heading="__('Inventori')" class="grid mt-2">
                     @if(auth()->user()?->can('manage categories'))

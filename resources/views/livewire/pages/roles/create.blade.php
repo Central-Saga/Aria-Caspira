@@ -4,6 +4,7 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Auth;
 
 new class extends Component {
     #[Layout('components.layouts.app')]
@@ -23,6 +24,16 @@ new class extends Component {
         if (!empty($data['selectedPermissions'])) {
             $role->syncPermissions($data['selectedPermissions']);
         }
+
+        activity('role')
+            ->causedBy(Auth::user())
+            ->performedOn($role)
+            ->event('created')
+            ->withProperties([
+                'name' => $role->name,
+                'permissions' => array_values($data['selectedPermissions'] ?? []),
+            ])
+            ->log('Role dibuat');
 
         session()->flash('message', __('Role dibuat.'));
         return $this->redirect(route('roles.index'), navigate: true);

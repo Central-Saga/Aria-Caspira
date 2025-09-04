@@ -4,6 +4,7 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\Auth;
 
 new class extends Component {
     #[Layout('components.layouts.app')]
@@ -26,8 +27,26 @@ new class extends Component {
             'selectedPermissions' => 'array',
             'selectedPermissions.*' => 'string|exists:permissions,name',
         ]);
+        $before = [
+            'name' => $this->role->name,
+            'permissions' => $this->role->permissions()->pluck('name')->toArray(),
+        ];
+
         $this->role->update(['name' => $data['name']]);
         $this->role->syncPermissions($data['selectedPermissions'] ?? []);
+
+        activity('role')
+            ->causedBy(Auth::user())
+            ->performedOn($this->role)
+            ->event('updated')
+            ->withProperties([
+                'before' => $before,
+                'after' => [
+                    'name' => $this->role->name,
+                    'permissions' => array_values($data['selectedPermissions'] ?? []),
+                ],
+            ])
+            ->log('Role diperbarui');
         session()->flash('message', __('Role diperbarui.'));
         return $this->redirect(route('roles.index'), navigate: true);
     }

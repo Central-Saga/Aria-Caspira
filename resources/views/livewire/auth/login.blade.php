@@ -40,6 +40,21 @@ new #[Layout('components.layouts.auth')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
+        // Activity log: user login
+        try {
+            activity('auth')
+                ->causedBy(Auth::user())
+                ->event('login')
+                ->withProperties([
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                    'email' => $this->email,
+                ])
+                ->log('User login');
+        } catch (\Throwable $e) {
+            // ignore logging failure to not block login
+        }
+
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 

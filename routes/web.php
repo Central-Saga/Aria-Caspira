@@ -66,6 +66,10 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('roles/edit/{role}', 'pages.roles.edit')
         ->name('roles.edit');
 
+    // Activity Logs
+    Volt::route('activity/logs', 'pages.activity.index')
+        ->name('activity.index');
+
     // Laporan Transaksi (printable HTML -> simpan PDF via browser)
     Route::get('laporan/transaksi/print', [\App\Http\Controllers\ReportController::class, 'transaksi'])
         ->name('transaksi.print');
