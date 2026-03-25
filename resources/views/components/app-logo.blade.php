@@ -1,6 +1,7 @@
-{{-- <div class="flex aspect-square size-8 items-center justify-center rounded-md bg-accent-content text-accent-foreground">
-    <x-app-logo-icon class="size-5 fill-current text-white dark:text-black" />
-</div> --}}
-<div class="ms-1 grid flex-1 text-start text-sm">
-    <span class="mb-0.5 truncate leading-tight font-semibold">Inventory Aria Caspira</span>
+<div class="flex items-center">
+    <img
+        src="{{ asset('image/ARIA LBL BLACK.png') }}"
+        alt="Aria Caspira"
+        {{ $attributes->class('h-16 w-auto object-contain dark:brightness-0 dark:invert') }}
+    >
 </div>

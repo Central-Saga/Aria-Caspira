@@ -2,10 +2,13 @@
 
 use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
+use Livewire\WithFileUploads;
 use App\Models\Baju;
 use App\Models\KategoriBaju;
 
 new class extends Component {
+    use WithFileUploads;
+
     #[Layout('components.layouts.app')]
 
     public $kategori_baju_id = null;
@@ -14,6 +17,7 @@ new class extends Component {
     public ?string $warna = null;
     public string $harga = '';
     public int $stok_tersedia = 0;
+    public $gambar = null;
 
     public function save()
     {
@@ -24,7 +28,12 @@ new class extends Component {
             'warna' => 'nullable|string|max:50',
             'harga' => 'required|numeric|min:0',
             'stok_tersedia' => 'required|integer|min:0',
+            'gambar' => 'nullable|image|max:2048',
         ]);
+
+        if ($this->gambar) {
+            $validated['gambar'] = $this->gambar->store('baju-images', 'public');
+        }
 
         Baju::create($validated);
 
@@ -108,6 +117,24 @@ new class extends Component {
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('Stok Tersedia') }}</label>
                         <input wire:model="stok_tersedia" type="number" class="w-full max-w-xs px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" min="0">
                         @error('stok_tersedia')<p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('Gambar Baju') }}</label>
+                        <input wire:model="gambar" type="file" accept="image/*" class="block w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-3 text-gray-900 dark:text-white file:mr-4 file:rounded-lg file:border-0 file:bg-emerald-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-emerald-700 hover:file:bg-emerald-100">
+                        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">{{ __('Format: JPG, PNG, WEBP. Maksimal 2MB.') }}</p>
+                        @error('gambar')<p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+
+                        <div wire:loading wire:target="gambar" class="mt-3 text-sm text-emerald-600">
+                            {{ __('Mengunggah gambar...') }}
+                        </div>
+
+                        @if ($gambar)
+                            <div class="mt-4 overflow-hidden rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-3">
+                                <p class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('Preview') }}</p>
+                                <img src="{{ $gambar->temporaryUrl() }}" alt="{{ __('Preview gambar baju') }}" class="h-56 w-full rounded-xl object-cover">
+                            </div>
+                        @endif
                     </div>
 
                     <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200 dark:border-gray-700">

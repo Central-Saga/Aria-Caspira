@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('kategori_bajus')) {
+            return;
+        }
+
         Schema::create('kategori_bajus', function (Blueprint $table) {
             // Kolom id sebagai Primary Key (BIGINT, auto-increment)
             $table->id();
@@ -32,6 +36,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('kategori_bajus')) {
+            return;
+        }
+
         Schema::dropIfExists('kategori_bajus');
     }
 };

@@ -14,10 +14,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             RolesAndPermissionsSeeder::class,
-            KategoriBajuSeeder::class,
-            BajuSeeder::class,
-            TransaksiSeeder::class,
-            NotifikasiStokSeeder::class,
+            // KategoriBajuSeeder::class,
+            // BajuSeeder::class,
+            // TransaksiSeeder::class,
+            // NotifikasiStokSeeder::class,
         ]);
     }
 }

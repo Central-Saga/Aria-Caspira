@@ -31,7 +31,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
 
         Auth::login($user);
 
-        $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(route('beranda', absolute: false), navigate: true);
     }
 }; ?>
 

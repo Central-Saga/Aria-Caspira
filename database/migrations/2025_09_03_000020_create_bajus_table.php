@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('bajus')) {
+            return;
+        }
+
         Schema::create('bajus', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kategori_baju_id')
@@ -31,7 +35,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('bajus')) {
+            return;
+        }
+
         Schema::dropIfExists('bajus');
     }
 };
-

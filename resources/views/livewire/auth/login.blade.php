@@ -55,7 +55,7 @@ new #[Layout('components.layouts.auth.card')] class extends Component {
             // ignore logging failure to not block login
         }
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(default: route('beranda', absolute: false), navigate: true);
     }
 
     /**

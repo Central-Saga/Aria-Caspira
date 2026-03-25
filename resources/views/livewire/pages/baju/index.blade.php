@@ -4,6 +4,8 @@ use Livewire\Volt\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use App\Models\Baju;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 new class extends Component {
     use WithPagination;
@@ -40,10 +42,16 @@ new class extends Component {
     {
         try {
             $baju = Baju::findOrFail($bajuId);
-            $baju->delete();
+
+            DB::transaction(function () use ($baju): void {
+                $baju->delete();
+            });
+
             session()->flash('message', __('Baju berhasil dihapus.'));
+        } catch (QueryException $e) {
+            session()->flash('error', __('Gagal menghapus baju karena masih terhubung dengan data lain.'));
         } catch (\Exception $e) {
-            session()->flash('error', __('Gagal menghapus baju: ') . $e->getMessage());
+            session()->flash('error', __('Gagal menghapus baju.'));
         }
 
         $this->cancelDelete();
@@ -160,6 +168,18 @@ new class extends Component {
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             @forelse($items as $item)
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                    <div class="aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-gray-900/40">
+                        @if($item->gambar)
+                            <img src="{{ asset('storage/' . $item->gambar) }}" alt="{{ $item->nama_baju }}" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
+                        @else
+                            <div class="flex h-full items-center justify-center bg-gradient-to-br from-emerald-500 to-teal-500">
+                                <svg class="h-14 w-14 text-white/90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2l2 2h4l2-2h2a2 2 0 012 2v2l-2 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2v-6L4 8V6z" />
+                                </svg>
+                            </div>
+                        @endif
+                    </div>
+
                     <div class="p-6 border-b border-gray-100 dark:border-gray-700">
                         <div class="flex items-start justify-between">
                             <div class="flex items-center space-x-3 min-w-0 flex-1">

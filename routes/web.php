@@ -5,9 +5,13 @@ use Livewire\Volt\Volt;
 
 Route::get('/', function () {
     return auth()->check()
-        ? redirect()->route('dashboard')
+        ? redirect()->route('beranda')
         : redirect()->route('login');
 })->name('home');
+
+Volt::route('beranda', 'pages.beranda')
+    ->middleware(['auth', 'verified'])
+    ->name('beranda');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
